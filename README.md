@@ -53,7 +53,7 @@ Run the following commands to install required packages:
 
 At this point, first test for debugging purpose
 > sudo chmod +x ./run*  
-> ./runDebug  
+> ./runDebug.sh    
 
 Once tested and verified, create a service: 
 > sudo cp pystream.service /etc/systemd/system  
