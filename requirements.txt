@@ -1,0 +1,6 @@
+flask
+wheel
+uwsgi
+pytest
+pyyaml
+netifaces

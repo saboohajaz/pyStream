@@ -1,0 +1,73 @@
+<!doctype html>
+
+<head>
+
+</head>
+
+<body>
+    <title>Pi Video Streamer</title>
+    <h1>Pi Video Streamer</h1>
+    <p>Use this page to configure streaming</p>
+
+    <form action="/videoset" method="post">
+        <label for="mode">Stream Mode:</label>
+        <select name="mode" id="mode" {% if status %}disabled{% endif %}>
+          <option {% if selmode=="RTSP" %}selected{% endif %} value="RTSP">RTSP</option>
+          <option {% if selmode=="RTP" %}selected{% endif %} value="RTP">RTP</option>
+        </select></br>
+        <label for="resolution">Resolution:</label>
+        <select name="resolution" id="resolution" {% if status %}disabled{% endif %}>
+          <option {% if selres=="1920x1080" %}selected{% endif %} value="1920x1080">1920x1080</option>
+          <option {% if selres=="1280x720" %}selected{% endif %} value="1280x720">1280x720</option>
+          <option {% if selres=="640x480" %}selected{% endif %} value="640x480">640x480</option>
+        </select></br>
+        <label for="rotation">Rotation:</label>
+        <select name="rotation" id="rotation" {% if status %}disabled{% endif %}>
+          <option {% if selrot=="0" %}selected{% endif %} value="0">0</option>
+          <option {% if selrot=="90" %}selected{% endif %} value="90">90</option>
+          <option {% if selrot=="180" %}selected{% endif %} value="180">180</option>
+          <option {% if selrot=="270" %}selected{% endif %} value="270">270</option>
+        </select></br>
+        <label for="framerate">Framerate:</label>
+        <input type="number" id="framerate" name="framerate" value="{{selframerate}}" min="5" max="25" {% if status %}disabled{% endif %}><br>
+        <label for="bitrate">Bitrate (kbps):</label>
+        <input type="number" id="bitrate" name="bitrate" value="{{selbitrate}}" min="50" max="10000" {% if status %}disabled{% endif %}><br>
+        <label for="ipaddress">Endpoint IP Address (only for RTP):</label>
+        <input type="text" id="ipaddress" name="ipaddress" value="{{selipaddress}}" {% if status %}disabled{% endif %} minlength="7" maxlength="15" size="15" pattern="^((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])$"><br>
+        {% if status %}
+          <input type="submit" value="Stop Streaming" method="post" enctype="multipart/form-data">
+        {% else %}
+          <input type="submit" value="Start Streaming" method="post" enctype="multipart/form-data">
+        {% endif %}
+    </form>
+
+{% if status %}
+  <p>Status: Streaming Active</p>
+    Gstreamer command to view video:</br>
+    <ul>
+    {% for vid in streamaddr %}
+        <li>
+        <samp>{{vid}}</samp>
+        </li>
+    {% endfor %}
+    </ul>
+    Mission Planner Gstreamer video string:</br>
+    <ul>
+    {% for vid in streammpstring %}
+        <li>
+        <samp>{{vid}}</samp>
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+  <p>Status: Streaming Stopped</p>
+{% endif %}
+
+  <p>System Temperature: {{tempC}}C (F5 to refresh)</p>
+
+  <p>{{cameraDetect}}</p>
+  
+  <form action="/restart" method="post">
+    <input type="submit" value="Restart Pi" method="post" enctype="multipart/form-data">
+  </form>
+</div>
