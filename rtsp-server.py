@@ -150,7 +150,6 @@ if __name__ == '__main__':
         s = GstServer()
         s.addStream(args.videosource, args.height, args.width, args.bitrate, args.format, args.rotation, args.fps)
 
-        s.addStream("testsrc", args.height, args.width, args.bitrate, None, None, args.fps)
         try:
             loop.run()
         except:
@@ -162,11 +161,6 @@ if __name__ == '__main__':
         pipeline = Gst.parse_launch(pipeline_str)
         pipeline.set_state(Gst.State.PLAYING)
         
-        pipeline_str = getPipeline("testsrc", args.height, args.width, args.bitrate, None, None, args.fps)
-        pipeline_str += " ! udpsink host={0} port={1}".format(args.udp.split(':')[0], int(args.udp.split(':')[1])+1)
-        pipeline2 = Gst.parse_launch(pipeline_str)
-        pipeline2.set_state(Gst.State.PLAYING)
-        
         print("Server sending UDP stream to " + args.udp)
         print("Use: gst-launch-1.0 udpsrc port={0} caps='application/x-rtp, media=(string)video, clock-rate=(int)90000, encoding-name=(string)H264' ! rtpjitterbuffer ! rtph264depay ! h264parse ! avdec_h264 ! autovideosink fps-update-interval=1000 sync=false".format(args.udp.split(':')[1]))
         print("Use: gst-launch-1.0 udpsrc port={0} caps='application/x-rtp, media=(string)video, clock-rate=(int)90000, encoding-name=(string)H264' ! rtpjitterbuffer ! rtph264depay ! h264parse ! avdec_h264 ! autovideosink fps-update-interval=1000 sync=false".format(int(args.udp.split(':')[1])+1))
@@ -176,6 +170,5 @@ if __name__ == '__main__':
         except:
             print("Exiting UDP Server")
             pipeline.set_state(Gst.State.NULL)
-            pipeline2.set_state(Gst.State.NULL)
             loop.quit()
 
