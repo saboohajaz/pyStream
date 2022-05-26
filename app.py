@@ -123,14 +123,14 @@ def videoget():
 
     if STREAMSETTINGS['active'] and STREAMSETTINGS['mode'] == "RTP":
         #format output url:
-        streamaddr = ["gst-launch-1.0 udpsrc port=5600 ! application/x-rtp,media=video,clock-rate=90000,encoding-name=H264 ! rtpjitterbuffer ! rtph264depay ! h264parse ! avdec_h264 ! autovideosink sync=false", "gst-launch-1.0 udpsrc port=5601 ! application/x-rtp,media=video,clock-rate=90000,encoding-name=H264 ! rtpjitterbuffer ! rtph264depay ! h264parse ! avdec_h264 ! autovideosink sync=false"]
-        streammpstring = ["udpsrc port=5600 buffer-size=90000 ! application/x-rtp ! rtpjitterbuffer ! rtph264depay ! h264parse ! avdec_h264 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink sync=false", "udpsrc port=5601 buffer-size=90000 ! application/x-rtp ! rtpjitterbuffer ! rtph264depay ! h264parse ! avdec_h264 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink sync=false"]
+        streamaddr = ["gst-launch-1.0 udpsrc port=5600 ! application/x-rtp,media=video,clock-rate=90000,encoding-name=H264 ! rtpjitterbuffer ! rtph264depay ! h264parse ! avdec_h264 ! autovideosink sync=false"]
+        streammpstring = ["udpsrc port=5600 buffer-size=90000 ! application/x-rtp ! rtpjitterbuffer ! rtph264depay ! h264parse ! avdec_h264 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink sync=false"]
     elif STREAMSETTINGS['active'] and STREAMSETTINGS['mode'] == "RTSP":
         device = 'devvideo0'
         #format output url:
         ip = request.host.split(':')[0]
-        streamaddr = ["gst-launch-1.0 rtspsrc location=rtsp://" + ip + ":8554/" + device + " latency=0 is-live=True ! queue ! decodebin ! autovideosink", "gst-launch-1.0 rtspsrc location=rtsp://" + ip + ":8554/testsrc latency=0 is-live=True ! queue ! decodebin ! autovideosink"]
-        streammpstring = ["rtspsrc location=rtsp://" + ip + ":8554/" + device + " latency=0 is-live=True ! queue ! application/x-rtp ! rtph264depay ! avdec_h264 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink", "rtspsrc location=rtsp://" + ip + ":8554/testsrc latency=0 is-live=True ! queue ! application/x-rtp ! rtph264depay ! avdec_h264 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink"]
+        streamaddr = ["gst-launch-1.0 rtspsrc location=rtsp://" + ip + ":8554/" + device + " latency=0 is-live=True ! queue ! decodebin ! autovideosink"]
+        streammpstring = ["rtspsrc location=rtsp://" + ip + ":8554/" + device + " latency=0 is-live=True ! queue ! application/x-rtp ! rtph264depay ! avdec_h264 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink"]
     else:
         streamaddr = ""
         streammpstring = ""
