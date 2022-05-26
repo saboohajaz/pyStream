@@ -55,7 +55,11 @@ At this point, first test for debugging purpose
 > sudo chmod +x ./run*  
 > ./runDebug.sh    
 
-Once tested and verified, create a service: 
+Note: In case runDebug.sh creates execution issue, it is probably it is modifid in windows and have EOL issue.   
+Usee this:   
+> sed -i -e 's/\r$//' ./runDebug.sh  
+
+Once tested and verified, create a service:  
 > sudo cp pystream.service /etc/systemd/system  
 > sudo systemctl enable pystream  
 > sudo systemctl start pystream  
