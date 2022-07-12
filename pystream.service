@@ -5,7 +5,8 @@ After=network.target
 [Service]
 User=pi
 WorkingDirectory=/home/pi/pyStream
-Environment="FLASK_APP=app; FLASK_ENV=production"
+Environment="FLASK_APP=app"
+Environment="FLASK_ENV=production"
 ExecStart=python3 app.py
 
 [Install]
