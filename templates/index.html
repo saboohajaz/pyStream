@@ -32,8 +32,10 @@
         <input type="number" id="framerate" name="framerate" value="{{selframerate}}" min="5" max="25" {% if status %}disabled{% endif %}><br>
         <label for="bitrate">Bitrate (kbps):</label>
         <input type="number" id="bitrate" name="bitrate" value="{{selbitrate}}" min="50" max="10000" {% if status %}disabled{% endif %}><br>
-        <label for="ipaddress">Endpoint IP Address (only for RTP):</label>
-        <input type="text" id="ipaddress" name="ipaddress" value="{{selipaddress}}" {% if status %}disabled{% endif %} minlength="7" maxlength="15" size="15" pattern="^((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])$"><br>
+        <label for="ipaddress">Endpoint IP Address 1 (only for RTP):</label>
+        <input type="text" id="ipaddress1" name="ipaddress1" value="{{selipaddress1}}" {% if status %}disabled{% endif %} minlength="7" maxlength="15" size="15" pattern="^((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])$"><br>
+        <label for="ipaddress">Endpoint IP Address 2 (only for RTP). Optional (blank to disable):</label>
+        <input type="text" id="ipaddress2" name="ipaddress2" value="{{selipaddress2}}" {% if status %}disabled{% endif %} minlength="7" maxlength="15" size="15" pattern="^((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])$"><br>
         {% if status %}
           <input type="submit" value="Stop Streaming" method="post" enctype="multipart/form-data">
         {% else %}

@@ -112,6 +112,7 @@ if __name__ == '__main__':
     parser.add_argument("--format", help="Video format", default="video/x-raw", type=str)
     parser.add_argument("--rotation", help="rotation angle", default=0, type=int, choices=[0, 90, 180, 270])
     parser.add_argument("--udp", help="use UDP sink (dest IP:port) instead of RTSP", default="0:5600", type=str)
+    parser.add_argument("--udp2", help="2nd UDP client. Optional", default="0:5600", type=str)
     parser.add_argument("--multirtsp", help="CSV of multi-camera setup. Format is videosource,height,width,bitrate,formatstr,rotation, fps;source2,etc", default="", type=str)
     args = parser.parse_args()
 
@@ -156,15 +157,22 @@ if __name__ == '__main__':
             print("Exiting RTSP Server")
             loop.quit()
     else:
-        pipeline_str = getPipeline(args.videosource, args.height, args.width, args.bitrate, args.format, args.rotation, args.fps)
-        pipeline_str += " ! udpsink host={0} port={1}".format(args.udp.split(':')[0], args.udp.split(':')[1])
-        pipeline = Gst.parse_launch(pipeline_str)
-        pipeline.set_state(Gst.State.PLAYING)
-        
-        print("Server sending UDP stream to " + args.udp)
+        if args.udp2 == "0:5600":
+            pipeline_str = getPipeline(args.videosource, args.height, args.width, args.bitrate, args.format, args.rotation, args.fps)
+            pipeline_str += " ! udpsink host={0} port={1}".format(args.udp.split(':')[0], args.udp.split(':')[1])
+            pipeline = Gst.parse_launch(pipeline_str)
+            pipeline.set_state(Gst.State.PLAYING)
+            
+            print("Server sending UDP stream to " + args.udp)
+        else:
+            pipeline_str = getPipeline(args.videosource, args.height, args.width, args.bitrate, args.format, args.rotation, args.fps)
+            pipeline_str += " ! tee name=t t. ! queue ! udpsink host={0} port={1}".format(args.udp.split(':')[0], args.udp.split(':')[1])
+            pipeline_str += " t. ! queue ! udpsink host={0} port={1}".format(args.udp2.split(':')[0], args.udp2.split(':')[1])
+            pipeline = Gst.parse_launch(pipeline_str)
+            pipeline.set_state(Gst.State.PLAYING)
+            
+            print("Server sending UDP stream to " + args.udp + " and " + args.udp2)
         print("Use: gst-launch-1.0 udpsrc port={0} caps='application/x-rtp, media=(string)video, clock-rate=(int)90000, encoding-name=(string)H264' ! rtpjitterbuffer ! rtph264depay ! h264parse ! avdec_h264 ! autovideosink fps-update-interval=1000 sync=false".format(args.udp.split(':')[1]))
-        print("Use: gst-launch-1.0 udpsrc port={0} caps='application/x-rtp, media=(string)video, clock-rate=(int)90000, encoding-name=(string)H264' ! rtpjitterbuffer ! rtph264depay ! h264parse ! avdec_h264 ! autovideosink fps-update-interval=1000 sync=false".format(int(args.udp.split(':')[1])+1))
-        print("Use: gst-launch-1.0 udpsrc port={0} caps='application/x-rtp, media=(string)video, clock-rate=(int)90000, encoding-name=(string)JPEG' ! rtpjitterbuffer ! rtpjpegdepay ! jpegdec ! videoconvert ! autovideosink sync=false".format(int(args.udp.split(':')[1])+2))
         try:
             loop.run()
         except:
