@@ -157,7 +157,7 @@ if __name__ == '__main__':
             print("Exiting RTSP Server")
             loop.quit()
     else:
-        if args.udp2 == "0:5600":
+        if args.udp2 == "0":
             pipeline_str = getPipeline(args.videosource, args.height, args.width, args.bitrate, args.format, args.rotation, args.fps)
             pipeline_str += " ! udpsink host={0} port={1}".format(args.udp.split(':')[0], args.udp.split(':')[1])
             pipeline = Gst.parse_launch(pipeline_str)
