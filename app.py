@@ -24,20 +24,23 @@ STREAMSETTINGS['bitrate'] = 200
 STREAMSETTINGS['framerate'] = 15
 STREAMSETTINGS['active'] = False
 STREAMSETTINGS['resolution'] = "640x480"
-STREAMSETTINGS['ipaddress'] = "127.0.0.1"
+STREAMSETTINGS['ipaddress1'] = "127.0.0.1"
+STREAMSETTINGS['ipaddress2'] = ""
 STREAMSETTINGS['mode'] = "RTP"
 STREAMSETTINGS['rotation'] = "0"
 
-def is_valid_ipv4_address(address):
+def is_valid_ipv4_address_and_port(addressPort):
     '''Returns true if string is a valid IPv4 address'''
     try:
-        socket.inet_pton(socket.AF_INET, address)
+        split = addressPort.split(':')
+        socket.inet_pton(socket.AF_INET, split[0])
+        port = int(split[1])
     except AttributeError:  # no inet_pton here, sorry
         try:
-            socket.inet_aton(address)
+            socket.inet_aton(split[0])
         except socket.error:
             return False
-        return address.count('.') == 3
+        return split[0].count('.') == 3 and port > 0
     except socket.error:  # not a valid address
         return False
 
@@ -72,7 +75,7 @@ def getCameraDetect():
     else:
         return False
         
-def doStream(resolution, bitrate, framerate, ipaddress, mode, rotation):
+def doStream(resolution, bitrate, framerate, ipaddress1, ipaddress2, mode, rotation):
     ''''Execute the streaming process'''
     global ISSTREAMING
     # form up the res arguments
@@ -92,11 +95,14 @@ def doStream(resolution, bitrate, framerate, ipaddress, mode, rotation):
         print("Killing zombie")
         ISSTREAMING.terminate()
     # and start streaming
+    if ipaddress2 == '':
+        ipaddress2 = '0'
     if mode == "RTP":
         ISSTREAMING = subprocess.Popen(['python3', 'rtsp-server.py',
                                         '--fps='+str(framerate),
                                         '--bitrate='+str(bitrate), width, height, device,
-                                        '--udp=' + ipaddress + ':5600',
+                                        '--udp=' + ipaddress1,
+                                        '--udp2=' + ipaddress2,
                                         '--rotation=' + rotation])
     else:
         ISSTREAMING = subprocess.Popen(['python3', 'rtsp-server.py',
@@ -123,8 +129,8 @@ def videoget():
 
     if STREAMSETTINGS['active'] and STREAMSETTINGS['mode'] == "RTP":
         #format output url:
-        streamaddr = ["gst-launch-1.0 udpsrc port=5600 ! application/x-rtp,media=video,clock-rate=90000,encoding-name=H264 ! rtpjitterbuffer ! rtph264depay ! h264parse ! avdec_h264 ! autovideosink sync=false"]
-        streammpstring = ["udpsrc port=5600 buffer-size=90000 ! application/x-rtp ! rtpjitterbuffer ! rtph264depay ! h264parse ! avdec_h264 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink sync=false"]
+        streamaddr = ["gst-launch-1.0 udpsrc port=<PORT> ! application/x-rtp,media=video,clock-rate=90000,encoding-name=H264 ! rtpjitterbuffer ! rtph264depay ! h264parse ! avdec_h264 ! autovideosink sync=false"]
+        streammpstring = ["udpsrc port=<PORT> buffer-size=90000 ! application/x-rtp ! rtpjitterbuffer ! rtph264depay ! h264parse ! avdec_h264 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink sync=false"]
     elif STREAMSETTINGS['active'] and STREAMSETTINGS['mode'] == "RTSP":
         device = 'devvideo0'
         #format output url:
@@ -149,7 +155,8 @@ def videoget():
                            selmode=STREAMSETTINGS['mode'],
                            streamaddr=streamaddr,
                            streammpstring=streammpstring,
-                           selipaddress=STREAMSETTINGS['ipaddress'],
+                           selipaddress1=STREAMSETTINGS['ipaddress1'],
+                           selipaddress2=STREAMSETTINGS['ipaddress2'],
                            tempC=getTemperature(),
                            cameraDetect=camString,
                            selrot=STREAMSETTINGS['rotation'])
@@ -174,11 +181,12 @@ def videopost():
             assert bitrate < 10001
             assert bitrate > 49
             if request.form['mode'] == 'RTP':
-                assert is_valid_ipv4_address(request.form['ipaddress'])
+                assert is_valid_ipv4_address_and_port(request.form['ipaddress1'])
+                assert (is_valid_ipv4_address_and_port(request.form['ipaddress2']) or request.form['ipaddress2'] == "")
         except Exception as e:
             return render_template('error.html', error=e)
 
-        doStream(request.form['resolution'], bitrate, framerate, request.form['ipaddress'], request.form['mode'], request.form['rotation'])
+        doStream(request.form['resolution'], bitrate, framerate, request.form['ipaddress1'], request.form['ipaddress2'], request.form['mode'], request.form['rotation'])
 
         STREAMSETTINGS['bitrate'] = bitrate
         STREAMSETTINGS['mode'] = request.form['mode']
@@ -186,7 +194,8 @@ def videopost():
         STREAMSETTINGS['active'] = True
         STREAMSETTINGS['resolution'] = request.form['resolution']
         STREAMSETTINGS['rotation'] = request.form['rotation']
-        STREAMSETTINGS['ipaddress'] = request.form['ipaddress']
+        STREAMSETTINGS['ipaddress1'] = request.form['ipaddress1']
+        STREAMSETTINGS['ipaddress2'] = request.form['ipaddress2']
         with open('settings.yaml', 'w') as fileout:
             yaml.dump(STREAMSETTINGS, fileout)
     else:
@@ -219,13 +228,15 @@ if __name__ == "__main__":
                     badsettings = True
                 if loadedSTREAMSETTINGS['mode'] not in ['RTP', 'RTSP']:
                     badsettings = True
-                if loadedSTREAMSETTINGS['mode'] == "RTP" and not is_valid_ipv4_address(loadedSTREAMSETTINGS['ipaddress']):
+                if loadedSTREAMSETTINGS['mode'] == "RTP" and not is_valid_ipv4_address_and_port(loadedSTREAMSETTINGS['ipaddress1']):
+                    badsettings = True
+                if loadedSTREAMSETTINGS['mode'] == "RTP" and not is_valid_ipv4_address_and_port(loadedSTREAMSETTINGS['ipaddress2']):
                     badsettings = True
                 if loadedSTREAMSETTINGS['rotation'] not in ['0', '90', '180', '270']:
                     badsettings = True
             except:
                 badSettings = True
-            if not badSettings:
+            if badSettings == False:
                 STREAMSETTINGS = loadedSTREAMSETTINGS
                 print("Loaded settings")
             else:
@@ -239,7 +250,8 @@ if __name__ == "__main__":
             doStream(STREAMSETTINGS['resolution'],
                      STREAMSETTINGS['bitrate'],
                      STREAMSETTINGS['framerate'],
-                     STREAMSETTINGS['ipaddress'],
+                     STREAMSETTINGS['ipaddress1'],
+                     STREAMSETTINGS['ipaddress2'],
                      STREAMSETTINGS['mode'],
                      STREAMSETTINGS['rotation'])
 
