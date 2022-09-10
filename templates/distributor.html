@@ -7,32 +7,43 @@
 <body>
     <title>Video Distributor</title>
     <h1>Pi Video Distributor</h1>
-    <p>Use this page to configure streaming</p>
-    
-    <p>The endpoint format is IP:Port (ie 127.0.0.1:5000). Only Endpoint 1 is required, all other endpoints being optional.</p>
+        <h2>Video Settings</h2>
+        <p>Use this page to configure streaming</p>
+        
+        <p>The endpoint format is IP:Port (ie 127.0.0.1:5000). Only Endpoint 1 is required, all other endpoints being optional.</p>
 
-    <form action="/distributorset" method="post">
-        <label for="inPort">Incoming video port:</label>
-        <input type="number" id="inPort" name="inPort" value="{{selinPort}}" min="5000" max="10000" {% if status %}disabled{% endif %}><br>
-        <label for="ipaddress1">Endpoint IP address and port 1:</label>
-        <input type="text" id="ipaddress1" name="ipaddress1" value="{{selipaddress1}}" {% if status %}disabled{% endif %} minlength="9" maxlength="21" size="15" pattern="^((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\:\d+$"><br>
-        <label for="ipaddress2">Endpoint IP address and port 2:</label>
-        <input type="text" id="ipaddress2" name="ipaddress2" value="{{selipaddress2}}" {% if status %}disabled{% endif %} minlength="9" maxlength="21" size="15" pattern="^((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\:\d+$"><br>
-        <label for="ipaddress3">Endpoint IP address and port 3:</label>
-        <input type="text" id="ipaddress3" name="ipaddress3" value="{{selipaddress3}}" {% if status %}disabled{% endif %} minlength="9" maxlength="21" size="15" pattern="^((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\:\d+$"><br>
-        <label for="ipaddress4">Endpoint IP address and port 4:</label>
-        <input type="text" id="ipaddress4" name="ipaddress4" value="{{selipaddress4}}" {% if status %}disabled{% endif %} minlength="9" maxlength="21" size="15" pattern="^((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\:\d+$"><br>
-        <label for="ipaddress5">Endpoint IP address and port 5:</label>
-        <input type="text" id="ipaddress5" name="ipaddress5" value="{{selipaddress5}}" {% if status %}disabled{% endif %} minlength="9" maxlength="21" size="15" pattern="^((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\:\d+$"><br>
-        {% if status %}
-          <input type="submit" value="Stop Streaming" method="post" enctype="multipart/form-data">
-        {% else %}
-          <input type="submit" value="Start Streaming" method="post" enctype="multipart/form-data">
-        {% endif %}
+        <form action="/distributorset" method="post">
+            <label for="inPort">Incoming video port:</label>
+            <input type="number" id="inPort" name="inPort" value="{{selinPort}}" min="5000" max="10000" {% if status %}disabled{% endif %}><br>
+            <label for="ipaddress1">Endpoint IP address and port 1:</label>
+            <input type="text" id="ipaddress1" name="ipaddress1" value="{{selipaddress1}}" {% if status %}disabled{% endif %} minlength="9" maxlength="21" size="15" pattern="^((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\:\d+$"><br>
+            <label for="ipaddress2">Endpoint IP address and port 2:</label>
+            <input type="text" id="ipaddress2" name="ipaddress2" value="{{selipaddress2}}" {% if status %}disabled{% endif %} minlength="9" maxlength="21" size="15" pattern="^((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\:\d+$"><br>
+            <label for="ipaddress3">Endpoint IP address and port 3:</label>
+            <input type="text" id="ipaddress3" name="ipaddress3" value="{{selipaddress3}}" {% if status %}disabled{% endif %} minlength="9" maxlength="21" size="15" pattern="^((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\:\d+$"><br>
+            <label for="ipaddress4">Endpoint IP address and port 4:</label>
+            <input type="text" id="ipaddress4" name="ipaddress4" value="{{selipaddress4}}" {% if status %}disabled{% endif %} minlength="9" maxlength="21" size="15" pattern="^((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\:\d+$"><br>
+            <label for="ipaddress5">Endpoint IP address and port 5:</label>
+            <input type="text" id="ipaddress5" name="ipaddress5" value="{{selipaddress5}}" {% if status %}disabled{% endif %} minlength="9" maxlength="21" size="15" pattern="^((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\:\d+$"><br>
+            {% if status %}
+              <input type="submit" value="Stop Streaming" method="post" enctype="multipart/form-data">
+            {% else %}
+              <input type="submit" value="Start Streaming" method="post" enctype="multipart/form-data">
+            {% endif %}
+        </form>
+    
+    <h2>Service Status</h2>
+    <form action="/services" method="post">
+        <ul>
+            {% for (service, status) in statusServices %}
+                <li>{{service}}: {{status}}  <button type="submit" name="restart" value="{{service}}">Restart</button></li>
+            {% endfor %}
+        </ul>
     </form>
 
+<h2>Video Status</h2>
 {% if status %}
-  <p>Status: Streaming Active</p>
+  <p>Video Status: Streaming Active</p>
     Gstreamer command to view video on endpoints (fill in &ltPORT&gt with the appropriate port number):</br>
     <ul>
     {% for vid in streamaddr %}

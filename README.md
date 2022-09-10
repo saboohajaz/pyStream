@@ -79,6 +79,9 @@ Run the following commands to install required packages:
 > echo "PATH=\$PATH:\~/.local/bin" >> \~/.profile   
 > source \~/.profile   
 > pip3 install -r requirements.txt --user   
+> sudo cp ./user_restart /etc/sudoers.d/
+> sudo chmod 0440 /etc/sudoers.d/user_restart
+> sudo touch /etc/sudoers.d/user_restart
 
 Run initially to check:  
 ./runReleaseDistributor.sh  
@@ -94,6 +97,8 @@ Once tested and verified, create a service:
 Once running, the video streamer will be active at http://<CM4 IP or Wireguard server IP>:5000, where settings can be configured.  
  
 The video streamer automatically saves settings and will restore them on reboot.
+
+Note that, in order for the Server to manage the Wireguard service properly, all Wireguard profiles need to be start via ``sudo systemctl start wg-quick@<Profile>.service``, where ``<Profile>`` is the Wireguard configuration file in ``/etc/wireguard/<Profile>.conf``.
 
 ### Video Receiver sample strings:  
 Sample Strings    

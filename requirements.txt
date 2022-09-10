@@ -4,3 +4,4 @@ uwsgi
 pytest
 pyyaml
 netifaces
+pydbus

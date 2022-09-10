@@ -11,6 +11,7 @@ import subprocess
 from os.path import exists
 import yaml
 import argparse
+from pydbus import SystemBus
 
 from flask import Flask, redirect, url_for
 from flask import render_template
@@ -112,6 +113,15 @@ def distributorget():
     else:
         streamaddr = ""
         streammpstring = ""
+    
+    # Get system service status
+    bus = SystemBus()
+    systemd = bus.get(".systemd1")
+    serv = []
+    for unit in systemd.ListUnits():
+        if unit[0] == "mavlink-router.service" or "wg-quick@" in unit[0]:
+            serv.append((unit[0], unit[3]))
+            #print(serv)
         
     return render_template('distributor.html', status=STREAMSETTINGS['active'],
                            selinPort=STREAMSETTINGS['inPort'],
@@ -121,7 +131,20 @@ def distributorget():
                            selipaddress4=STREAMSETTINGS['ipaddress4'],
                            selipaddress5=STREAMSETTINGS['ipaddress5'],
                            streamaddr=streamaddr,
-                           streammpstring=streammpstring)
+                           streammpstring=streammpstring,
+                           statusServices=serv)
+
+@APP.route('/services', methods=['POST'])
+def serviceset():
+    '''Restart a service'''
+    servToRestart = request.form['restart']
+    
+    # only want to restart mavlink or wireguard
+    if servToRestart == "mavlink-router.service" or "wg-quick@" in servToRestart:
+        # have to use sudo, not pydbus
+        subprocess.Popen(['sudo', 'systemctl', 'restart', servToRestart])
+        print("Restarting: " + servToRestart)
+    return redirect(url_for('distributorget'))
 
 @APP.route('/distributorset', methods=['POST'])
 def distributorset():

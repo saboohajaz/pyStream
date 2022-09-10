@@ -1,0 +1,2 @@
+stephen ALL=NOPASSWD: /bin/systemctl restart mavlink-router.service
+stephen ALL=NOPASSWD: /bin/systemctl restart wg-quick@*.service
